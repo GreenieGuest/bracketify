@@ -1,19 +1,30 @@
+@font-face {
+  font-family: Chalet;
+  src: url(fonts/Chalet1970.otf);
+}
+
 body {
-	background-color: black;
-	color: white;
-	font-family: Arial;
+	background-color: white;
+	color: black;
+	font-family: Chalet;
 }
 
 h1 {
-	color: yellow;
-	font-family: Arial;
-	text-align: center
+	color: crimson;
+	font-family: Chalet;
+	text-align: center;
+	font-size: 48px;
 }
 
 div {
+	background-color: black;
+	color: crimson;
 	width: fit-content;
 	margin: auto;
-	text-align: center
+	padding: 10px;
+	text-align: left;
+	font-style: italic;
+	font-size: 14px;
 }
 
 button {
