@@ -1,0 +1,27 @@
+body {
+	background-color: black;
+	color: white;
+	font-family: Arial;
+}
+
+h1 {
+	color: yellow;
+	font-family: Arial;
+	text-align: center
+}
+
+div {
+	width: fit-content;
+	margin: auto;
+	text-align: center
+}
+
+button {
+  margin:auto;
+  display:block;
+}
+
+input {
+  margin:auto;
+  display:block;
+}
