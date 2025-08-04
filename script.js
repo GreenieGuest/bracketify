@@ -1,11 +1,19 @@
 const textbox = document.getElementById("input");
 const div = document.getElementById("output");
 
-const bracket_seed_order = [1, 64, 32, 33, 17, 48, 16, 49, 9, 56, 24, 41, 25, 40, 8, 57, 5, 60, 28, 37, 21, 44, 12, 53, 13, 52, 20, 45, 4, 61, 29, 36, 3, 62, 30, 35, 19, 46, 14, 51, 11, 54, 22, 43, 27, 38, 6, 59, 7, 58, 26, 39, 23, 42, 10, 55, 15, 50, 18, 47, 31, 34, 2, 63
+const bracket_seed_order = [
+    1, 64, 32, 33, 17, 48, 16, 49,
+    9, 56, 24, 41, 25, 40, 8, 57,
+    5, 60, 28, 37, 21, 44, 12, 53,
+    13, 52, 20, 45, 4, 61, 29, 36,
+    3, 62, 30, 35, 19, 46, 14, 51,
+    11, 54, 22, 43, 27, 38, 6, 59,
+    7, 58, 26, 39, 23, 42, 10, 55,
+    15, 50, 18, 47, 31, 34, 2, 63
 ]
 
 async function getTopArtists(username, apiKey) {
-    const url = `http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${username}&api_key=${apiKey}&format=json&limit=64`;
+    const url = `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${username}&api_key=${apiKey}&format=json&limit=64`;
     try {
         const response = await fetch(url);
         const data = await response.json();
@@ -49,7 +57,5 @@ function loadItUp() {
 	username = textbox.value;
 	getTopArtists(username, "38453222bd8526be0f30d941903e739f"); 
 }
-
-// Replace with your Last.fm username and API key
 
 document.getElementById("proceed").addEventListener("click", loadItUp);
