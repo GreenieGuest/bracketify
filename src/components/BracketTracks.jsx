@@ -23,7 +23,7 @@ const Bracket = ({username, mode, bgcolor, textcolor}) => {
 			debounce(500, (e) => {
 				{mode == "artist" ? (
 					axios.get(`
-						https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${e.split(' ').join('_')}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
+						https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${e.split(' ').join('+')}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
 					.then(
 						response => setTopTracks(response.data.toptracks.track)
 					)

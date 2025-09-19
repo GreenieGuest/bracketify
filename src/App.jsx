@@ -1,8 +1,9 @@
 import {useState, useRef} from "react";
 import {ArtistBracket} from "./components/BracketArtists.jsx";
 import {Bracket} from "./components/BracketTracks.jsx";
-//import {ManualPicker} from "./components/ManualCell.jsx";
-import {Container, Flex, Heading, Button, Input, ColorPicker, HStack, Portal, parseColor, VStack, Select, createListCollection, Grid, GridItem} from "@chakra-ui/react";
+import {ManualBracket} from "./components/BracketManual.jsx";
+import {ManualPicker} from "./components/ManualCell.jsx";
+import {Container, Flex, Heading, Button, Input, ColorPicker, HStack, Portal, parseColor, VStack, Select, createListCollection, Text} from "@chakra-ui/react";
 import {DownloadImage} from "./DownloadImage.js";
 import './App.css'
 
@@ -14,6 +15,15 @@ function App() {
 	const [backgroundColor, setBackgroundColor] = useState(parseColor("#ffffff"));
 	const [textColor, setTextColor] = useState(parseColor("#ffffff"));
 
+	const [selectedTracks, setSelectedTracks] = useState(Array(64).fill(
+		{
+			"title": null,
+			"name": "Null",
+			"artist": "Null",
+			"listeners": "0"
+		}
+	));
+
 	const handleUsernameChange = (event) => {
 		setUsername(input);
 	};
@@ -24,7 +34,7 @@ function App() {
 			{ label: "Top Artists (name only)", value: "artists" },
 			{ label: "Top Tracks", value: "tracks" },
 			{ label: "One Artist", value: "artist" },
-			//{ label: "Manual", value: "man" },
+			{ label: "Manual", value: "man" },
 		],
 	})
 
@@ -111,23 +121,33 @@ function App() {
 					</Select.Root>
 				</Flex>
 
-				{/*mode == "man" ? (
-					<Grid templateColumns={'repeat(8, 1fr)'} gap={3}>
-						{
-							new Array(8).fill(0).map((_, rowIndex) => (
-								new Array(8).fill(0).map((_, colIndex) => {
-									return (
-										<GridItem>
-											<ManualPicker/>
-										</GridItem>
-									)
-								})
-							))
-						}
-					</Grid>
+				{mode == "man" ? (
+					<VStack>
+					<Text>Enter songs below by searching for an artist and picking a track. They'll be seeded automatically.</Text>
+						<VStack 
+							maxHeight="600px"
+							width="400px"
+							overflowY="auto"
+						>
+							{Array.from({ length: 64 }).map((_, index) => (
+								<ManualPicker
+									key={index}
+									title={`Track ${index + 1}`}
+									onTrackSelect={(trackData) => {
+										setSelectedTracks(prev => {
+										const updated = [...prev];
+										updated[index] = trackData;
+										console.log(selectedTracks)
+										return updated;
+										});
+									}}
+								/>
+							))}
+						</VStack>
+					</VStack>
 				) : (
 					null
-				)*/}
+				)}
 
 				<Button variant={'ghost'} colorPalette={'red'} onClick={handleUsernameChange}>Generate!</Button>
 
@@ -136,10 +156,26 @@ function App() {
 					overflowX="auto"
 					scrollBehavior="smooth"
 				>
-					{mode == "artists" || mode == "default" ? (
-						<ArtistBracket username={username} mode={mode} bgcolor={backgroundColor} textcolor={textColor}/>
-					) : (
-						<Bracket username={username} mode={mode} bgcolor={backgroundColor} textcolor={textColor}/>
+					{mode === "artists" || mode === "default" ? (
+						<ArtistBracket
+							username={username}
+							mode={mode}
+							bgcolor={backgroundColor}
+							textcolor={textColor}
+						/>
+						) : mode === "man" ? (
+						<ManualBracket
+							tracks={selectedTracks}
+							bgcolor={backgroundColor}
+							textcolor={textColor}
+						/>
+						) : (
+						<Bracket
+							username={username}
+							mode={mode}
+							bgcolor={backgroundColor}
+							textcolor={textColor}
+						/>
 					)}
 				</Flex>
 			</VStack>
