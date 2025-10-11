@@ -11,6 +11,7 @@ function App() {
 	const [username, setUsername] = useState("");
 	const [input, setInput] = useState("");
 	const [mode, setMode] = useState("default");
+	const [timeframe, setTimeframe] = useState("overall");
     const bracket = useRef(null);
 	const [backgroundColor, setBackgroundColor] = useState(parseColor("#ffffff"));
 	const [textColor, setTextColor] = useState(parseColor("#ffffff"));
@@ -38,12 +39,24 @@ function App() {
 		],
 	})
 
+	const timeframes = createListCollection({
+		items: [
+			{ label: "Lifetime", value: "overall" },
+			{ label: "Last 7 Days", value: "7day" },
+			{ label: "Last 30 Days", value: "1month" },
+			{ label: "Last 3 Months", value: "3month" },
+			{ label: "Last 6 Months", value: "6month" },
+			{ label: "Last 12 Months", value: "12month" },
+		],
+	})
+
 	return (
 		<Container pt={5} width={'auto'}>
 			<Flex pb={5} justifyContent={"center"}>
-					<Heading fontSize={'5xl'} color={'crimson'}>Bracketify</Heading>
+					<Heading fontSize={'5xl'} color={'crimson'}>MusicBracket.fm</Heading>
 			</Flex>
 			<VStack>
+				<Text>Pit your most listened to artists against each other, or create a custom showdown by making a manual bracket!</Text>
 				{mode == "artist" ? (
 					<Input placeholder="Enter artist name..." value={input} width={400} onChange={(e) => setInput(e.target.value)}/>
 				) : (
@@ -95,7 +108,7 @@ function App() {
 				
 				{/*Artist Customization*/}
 				<Flex pb={5} spaceX={4} justifyContent={"center"}>
-					<Select.Root collection={options} onChange={(e) => setMode(e.target.value)} size="sm" width="320px">
+					<Select.Root collection={options} onChange={(e) => setMode(e.target.value)} size="sm" width="250px">
 						<Select.HiddenSelect />
 						<Select.Label>Content</Select.Label>
 						<Select.Control>
@@ -119,6 +132,36 @@ function App() {
 							</Select.Positioner>
 						</Portal>
 					</Select.Root>
+
+					{/*Timeframes only available for certain Last.fm API fetches*/}
+					{mode == "default" || mode == "artists" || mode == "tracks" ? (
+						<Select.Root collection={timeframes} onChange={(e) => setTimeframe(e.target.value)} size="sm" width="150px">
+							<Select.HiddenSelect />
+							<Select.Label>Timeframe</Select.Label>
+							<Select.Control>
+								<Select.Trigger>
+								<Select.ValueText placeholder="Lifetime" />
+								</Select.Trigger>
+								<Select.IndicatorGroup>
+								<Select.Indicator />
+								</Select.IndicatorGroup>
+							</Select.Control>
+							<Portal>
+								<Select.Positioner>
+								<Select.Content>
+									{timeframes.items.map((option) => (
+									<Select.Item item={option} key={option.value}>
+										{option.label}
+										<Select.ItemIndicator />
+									</Select.Item>
+									))}
+								</Select.Content>
+								</Select.Positioner>
+							</Portal>
+						</Select.Root>
+					) : (
+						null
+					)}
 				</Flex>
 
 				{mode == "man" ? (
@@ -159,6 +202,7 @@ function App() {
 					{mode === "artists" || mode === "default" ? (
 						<ArtistBracket
 							username={username}
+							timeframe={timeframe}
 							mode={mode}
 							bgcolor={backgroundColor}
 							textcolor={textColor}
@@ -172,6 +216,7 @@ function App() {
 						) : (
 						<Bracket
 							username={username}
+							timeframe={timeframe}
 							mode={mode}
 							bgcolor={backgroundColor}
 							textcolor={textColor}

@@ -5,7 +5,7 @@ import {debounce} from "throttle-debounce";
 import image from '../assets/bracket.png';
 
 
-const Bracket = ({username, mode, bgcolor, textcolor}) => {
+const Bracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
 	const bracket_seed_order = [
 		1, 64, 32, 33, 17, 48, 16, 49,
 		9, 56, 24, 41, 25, 40, 8, 57,
@@ -23,13 +23,13 @@ const Bracket = ({username, mode, bgcolor, textcolor}) => {
 			debounce(500, (e) => {
 				{mode == "artist" ? (
 					axios.get(`
-						https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${e.split(' ').join('+')}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
+						https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${e.split(' ').join('+').replace('&',"and")}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
 					.then(
 						response => setTopTracks(response.data.toptracks.track)
 					)
 				) : (		
 					axios.get(`
-						https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${e}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
+						https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${e}&period=${timeframe}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
 					.then(
 						response => setTopTracks(response.data.toptracks.track)
 					)
@@ -43,7 +43,7 @@ const Bracket = ({username, mode, bgcolor, textcolor}) => {
 			setTopTracks([]);
 			returnTopTracks(username);
 		}
-	}, [username, mode]);
+	}, [username, mode, timeframe]);
 
 	if (topTracks.length <= 1) {
 		return (null);

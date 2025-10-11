@@ -5,7 +5,7 @@ import {debounce} from "throttle-debounce";
 import image from '../assets/bracket.png';
 
 
-const ArtistBracket = ({username, mode, bgcolor, textcolor}) => {
+const ArtistBracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
 	const bracket_seed_order = [
 		1, 64, 32, 33, 17, 48, 16, 49,
 		9, 56, 24, 41, 25, 40, 8, 57,
@@ -21,11 +21,14 @@ const ArtistBracket = ({username, mode, bgcolor, textcolor}) => {
 
 	const returnTopArtists = useMemo(
 		() =>
-			debounce(500, (e) => {
-				axios.get(`https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${e}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
-				.then(
-					response => setTopArtists(response.data.topartists.artist)
-				)
+			debounce(500, (e, t) => {
+				axios.get(`https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${e}&period=${t}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
+				.then(response => {
+					setTopArtists(response.data.topartists.artist);
+				})
+				.catch(error => {
+					console.error("Error fetching date:", error);
+				});
 			}),
 		[]	
 	)
@@ -34,15 +37,18 @@ const ArtistBracket = ({username, mode, bgcolor, textcolor}) => {
 		if (username) {
 			setTopArtists([]);
 			setArtistSongs({});
-			returnTopArtists(username);
+			returnTopArtists(username, timeframe);
 		}
-	}, [username]);
+	}, [username, mode, timeframe]);
 	useEffect(() => {
 		if (mode == "default" && topArtists.length === 64 && Object.keys(artistSongs).length === 0) {
 			topArtists.forEach(artist => {
-				axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getTopTracks&artist=${artist.name}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=1`)
+				axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getTopTracks&artist=${artist.name.split(' ').join('+').replace('&',"and")}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=1`)
 					.then(response => {
-						var index = 0;
+						var index = 0; //unused, might use in future for "Weighted Brackets" (top artists get more songs)
+						console.log(response.data.toptracks);
+						console.log(timeframe);
+						console.log(artist.name);
 						while (response.data.toptracks.track?.[index] in artistSongs) {
 							index++;
 						}
@@ -53,6 +59,9 @@ const ArtistBracket = ({username, mode, bgcolor, textcolor}) => {
 								[artist.name]: topTrack.name
 							}));
 						}
+					})
+					.catch(error => {
+						console.error("Error fetching date:", error);
 					});
 			});
 		}
