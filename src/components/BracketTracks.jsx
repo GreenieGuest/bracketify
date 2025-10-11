@@ -20,7 +20,7 @@ const Bracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
 
 	const returnTopTracks = useMemo(
 		() =>
-			debounce(500, (e) => {
+			debounce(500, (e, t) => {
 				{mode == "artist" ? (
 					axios.get(`
 						https://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${e.split(' ').join('+').replace('&',"and")}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
@@ -29,7 +29,7 @@ const Bracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
 					)
 				) : (		
 					axios.get(`
-						https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${e}&period=${timeframe}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
+						https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${e}&period=${t}&api_key=38453222bd8526be0f30d941903e739f&format=json&limit=64`)
 					.then(
 						response => setTopTracks(response.data.toptracks.track)
 					)
@@ -41,7 +41,7 @@ const Bracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
 	useEffect(() => {
 		if (username) {
 			setTopTracks([]);
-			returnTopTracks(username);
+			returnTopTracks(username, timeframe);
 		}
 	}, [username, mode, timeframe]);
 
