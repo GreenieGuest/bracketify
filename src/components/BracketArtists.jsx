@@ -1,11 +1,11 @@
-import {Text, VStack} from "@chakra-ui/react";
+import {Text, VStack, Box} from "@chakra-ui/react";
 import {useState, useMemo, useEffect} from "react";
 import axios from "axios";
 import {debounce} from "throttle-debounce";
 import image from '../assets/bracket.png';
 
 
-const ArtistBracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
+const ArtistBracket = ({username, mode, timeframe, bgcolor, bracketcolor, textcolor}) => {
 	const bracket_seed_order = [
 		1, 64, 32, 33, 17, 48, 16, 49,
 		9, 56, 24, 41, 25, 40, 8, 57,
@@ -75,34 +75,73 @@ const ArtistBracket = ({username, mode, timeframe, bgcolor, textcolor}) => {
 		return (<Text>Loading songs...</Text>);
 	} else {
 		return (
-			<VStack
-				alignItems="flex-start"
-				width={1257}
+			<Box
+			position="relative"
+			width={1257}
+			height="auto"
+			display="inline-block">
+				<Box
+					position="absolute" //BACKGROUND LAYER
+					width="100%"
+					height="100%"
+					bg={bgcolor.toString('hexa')}
+					zIndex={1}
+					pointerEvents="none"
+
+					WebkitMaskImage={`url(${image})`} //Utilize mask to create background coloring for bracket
+					WebkitMaskRepeat="no-repeat"
+					WebkitMaskPosition="center"
+					WebkitMaskComposite="destination-in"
+					WebkitMaskSize="100% 100%"
+					WebkitMaskImageRendering="pixelated"
+					WebkitMaskMode="luminance"
+					
+					maskImage={`url(${image})`}
+					maskSize="100% 100%"
+					maskRepeat="no-repeat"
+					maskPosition="center"
+					maskMode="luminance"
+					maskComposite="intersect"
+				>
+				</Box>
+
+				<Box
+				position="absolute" //BRACKET LAYER
+				width="100%"
+				height="100%"
+				zIndex={0}
+				pointerEvents="none"
+				bg={bracketcolor.toString('hexa')} //Colors the TRANSPARENT BRACKET SHAPE inside the image using the masked background
+				>
+				</Box>
+
+				<VStack
+				alignItems="flex-start" //TEXT/OTHER LAYER
+				width="100%"
 				p="10px"
-				bg={bgcolor.toString('hexa')}
-				color={textcolor.toString('hexa')}
-				bgImage={`url(${image})`}
-				bgSize='cover'
-				bgRepeat="no-repeat"
-			>
-				{bracket_seed_order.map((seed, index) => {
-					const artist = topArtists[seed - 1];
-					const songName = artistSongs[artist.name] || "No top track found";
-					if (mode == "default") { //artist name + track
-						return (
-							<Text key={index} fontSize={'xs'}>
-								<Text as={'b'}>{seed}</Text> {artist.name} - {songName || "loading..."}
-							</Text>
-						);
-					} else {
-						return (
-							<Text key={index} fontSize={'xs'}>
-								<Text as={'b'}>{seed}</Text> {artist.name}
-							</Text>
-						);
-					}
-				})}
-			</VStack>
+				color={textcolor.toString('hexa')} //Colors TEXT PLACED OVER IMAGE (not affected)
+    			position="relative"
+				zIndex={2}
+				>
+					{bracket_seed_order.map((seed, index) => {
+						const artist = topArtists[seed - 1];
+						const songName = artistSongs[artist.name] || "No top track found";
+						if (mode == "default") { //artist name + track
+							return (
+								<Text key={index} fontSize={'xs'}>
+									<Text as={'b'}>{seed}</Text> {artist.name} - {songName || "loading..."}
+								</Text>
+							);
+						} else {
+							return (
+								<Text key={index} fontSize={'xs'}>
+									<Text as={'b'}>{seed}</Text> {artist.name}
+								</Text>
+							);
+						}
+					})}
+				</VStack>
+			</Box>
 		)
 	}
 }

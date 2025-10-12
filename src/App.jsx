@@ -10,10 +10,14 @@ import './App.css'
 function App() {
 	const [username, setUsername] = useState("");
 	const [input, setInput] = useState("");
+    const bracket = useRef(null);
+
 	const [mode, setMode] = useState("default");
 	const [timeframe, setTimeframe] = useState("overall");
-    const bracket = useRef(null);
-	const [backgroundColor, setBackgroundColor] = useState(parseColor("#ffffff"));
+	const [seeding, setSeeding] = useState("default");
+
+	const [bracketColor, setBracketColor] = useState(parseColor("#ffffff"));
+	const [backgroundColor, setBackgroundColor] = useState(parseColor("#000000"));
 	const [textColor, setTextColor] = useState(parseColor("#ffffff"));
 
 	const [selectedTracks, setSelectedTracks] = useState(Array(64).fill(
@@ -50,6 +54,16 @@ function App() {
 		],
 	})
 
+	const seedings = createListCollection({
+		items: [
+			{ label: "Popularity", value: "default" },
+			{ label: "Artist", value: "artist" },
+			{ label: "Random", value: "random" },
+			{ label: "In-Order", value: "inorder" },
+			{ label: "Manual", value: "manual" },
+		],
+	})
+
 	return (
 		<Container pt={5} width={'auto'}>
 			<Flex pb={5} justifyContent={"center"}>
@@ -65,7 +79,28 @@ function App() {
 
 				{/*Color Customization*/}
 				<Flex pb={5} spaceX={5} justifyContent={"center"}>
-					<ColorPicker.Root defaultValue={backgroundColor} onValueChange={(e) => setBackgroundColor(e.value)} maxW="200px">
+					
+					<ColorPicker.Root defaultValue={backgroundColor} onValueChange={(e) => setBackgroundColor(e.value)} maxW="130px">
+						<ColorPicker.HiddenInput />
+						<ColorPicker.Label>Background Color</ColorPicker.Label>
+						<ColorPicker.Control>
+							<ColorPicker.Input />
+							<ColorPicker.Trigger />
+						</ColorPicker.Control>
+						<Portal>
+							<ColorPicker.Positioner>
+							<ColorPicker.Content>
+								<ColorPicker.Area />
+								<HStack>
+								<ColorPicker.EyeDropper size="xs" variant="outline" />
+								<ColorPicker.Sliders />
+								</HStack>
+							</ColorPicker.Content>
+							</ColorPicker.Positioner>
+						</Portal>
+					</ColorPicker.Root>
+
+					<ColorPicker.Root defaultValue={bracketColor} onValueChange={(e) => setBracketColor(e.value)} maxW="130px">
 						<ColorPicker.HiddenInput />
 						<ColorPicker.Label>Bracket Color</ColorPicker.Label>
 						<ColorPicker.Control>
@@ -85,7 +120,7 @@ function App() {
 						</Portal>
 					</ColorPicker.Root>
 
-					<ColorPicker.Root defaultValue={textColor} onValueChange={(e) => setTextColor(e.value)} maxW="200px">
+					<ColorPicker.Root defaultValue={textColor} onValueChange={(e) => setTextColor(e.value)} maxW="130px">
 						<ColorPicker.HiddenInput />
 						<ColorPicker.Label>Text Color</ColorPicker.Label>
 						<ColorPicker.Control>
@@ -162,6 +197,36 @@ function App() {
 					) : (
 						null
 					)}
+
+					{/*Seeding only available for manual*/}
+					{mode == "man" ? (
+						<Select.Root collection={seedings} onChange={(e) => setSeeding(e.target.value)} size="sm" width="150px">
+							<Select.HiddenSelect />
+							<Select.Label>Seeding</Select.Label>
+							<Select.Control>
+								<Select.Trigger>
+								<Select.ValueText placeholder="Popularity" />
+								</Select.Trigger>
+								<Select.IndicatorGroup>
+								<Select.Indicator />
+								</Select.IndicatorGroup>
+							</Select.Control>
+							<Portal>
+								<Select.Positioner>
+								<Select.Content>
+									{seedings.items.map((option) => (
+									<Select.Item item={option} key={option.value}>
+										{option.label}
+										<Select.ItemIndicator />
+									</Select.Item>
+									))}
+								</Select.Content>
+								</Select.Positioner>
+							</Portal>
+						</Select.Root>
+					) : (
+						null
+					)}
 				</Flex>
 
 				{mode == "man" ? (
@@ -192,7 +257,7 @@ function App() {
 					null
 				)}
 
-				<Button variant={'ghost'} colorPalette={'red'} onClick={handleUsernameChange}>Generate!</Button>
+				<Button variant={'outline'} colorPalette={'red'} onClick={handleUsernameChange}>Generate!</Button>
 
 				<Flex
 					ref={bracket}
@@ -205,12 +270,15 @@ function App() {
 							timeframe={timeframe}
 							mode={mode}
 							bgcolor={backgroundColor}
+							bracketcolor={bracketColor}
 							textcolor={textColor}
 						/>
 						) : mode === "man" ? (
 						<ManualBracket
 							tracks={selectedTracks}
+							seeding={seeding}
 							bgcolor={backgroundColor}
+							bracketcolor={bracketColor}
 							textcolor={textColor}
 						/>
 						) : (
@@ -219,13 +287,14 @@ function App() {
 							timeframe={timeframe}
 							mode={mode}
 							bgcolor={backgroundColor}
+							bracketcolor={bracketColor}
 							textcolor={textColor}
 						/>
 					)}
 				</Flex>
 			</VStack>
 			<Flex mt={5} justifyContent={'center'}>
-            	<Button variant={'ghost'} colorPalette={'red'} onClick={() => {
+            	<Button variant={'outline'} colorPalette={'red'} onClick={() => {
             	    DownloadImage(bracket.current)
             	}}>Download Image</Button>
         	</Flex>

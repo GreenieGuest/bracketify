@@ -51,7 +51,7 @@ const ManualPicker = ({title, onTrackSelect}) => {
     return (
         <VStack>
             <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
-                <Popover.Trigger>
+                <Popover.Trigger className={'manual-button'}>
                     <VStack gap={1} alignItems="flex-start">
                         {
                             selectedTrack !== "" ?
